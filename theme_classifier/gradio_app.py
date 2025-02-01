@@ -35,7 +35,7 @@ def main():
                         get_themes_button = gr.Button("Get Themes")
                         get_themes_button.click(get_themes, inputs=[theme_list, subtitles_path, save_path], outputs=[plot])
 
-    iface.launch(share=False)
+    iface.launch(share=True)
 
 if __name__ == '__main__':
     main()
