@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from theme_classifier import ThemeClassifier
 import os
 import pandas as pd
+from character_network import name_entity_recognizer, character_network_generator
 
 def get_themes(theme_list_str,subtitles_path,save_path):
     theme_list_str = ",".join(word.strip().title() for word in theme_list_str.replace(" ", "").split(","))
@@ -25,6 +26,18 @@ def get_themes(theme_list_str,subtitles_path,save_path):
 
     return fig  
 
+def get_character_network(subtitles_path, ner_path):
+    ner = name_entity_recognizer.NamedEntityRecognizer()
+    if not ner_path:
+        ner_path = "temp.csv"
+    ner_data = ner.get_ners(subtitles_path, ner_path)
+
+    character_network = character_network_generator.CharacterNetworkGenerator()
+    relationship_data = character_network.generate_character_network(ner_data)
+    html = character_network.draw_network_graph(relationship_data)
+
+    return html
+
 def main():
     with gr.Blocks() as iface:
         with gr.Row():
@@ -39,6 +52,19 @@ def main():
                         save_path = gr.Textbox(label="Save Path (optional)")
                         get_themes_button = gr.Button("Get Themes")
                         get_themes_button.click(get_themes, inputs=[theme_list, subtitles_path, save_path], outputs=[plot])
+
+        with gr.Row():
+            with gr.Column():
+                gr.HTML("<h1>Character Network (NERs and Graphs)</h1>")
+                with gr.Row():
+                    with gr.Column():
+                        network_html = gr.HTML()
+                    with gr.Column():
+                        subtitles_path = gr.Textbox(label="Subtutles or Script Path")
+                        ner_path = gr.Textbox(label="NERs save path")
+                        get_network_graph_button = gr.Button("Get Character Network")
+                        get_network_graph_button.click(get_character_network, inputs=[subtitles_path,ner_path], outputs=[network_html])
+
 
     iface.launch(share=False)
 

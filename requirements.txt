@@ -1,3 +1,5 @@
 transformers == 4.44.0
 huggingface_hub == 0.25.0
 gradio
+nltk
+pyvis
